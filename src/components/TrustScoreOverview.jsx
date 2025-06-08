@@ -5,9 +5,6 @@ import TrustScoreDonut from "./TrustScoreDonut";
 import { Shield } from "lucide-react";
 import { initialTrustScoreData } from "../data/mockData";
 
-// Amazon brand orange for accents
-const AMAZON_ORANGE = "#FF9900";
-
 const TrustScoreOverview = () => (
   <Card className="flex flex-col border border-app bg-app-card rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300">
     <CardHeader
@@ -25,10 +22,10 @@ const TrustScoreOverview = () => (
           >
             <div className="flex items-center gap-2">
               <div
-                className="w-3 h-3 rounded-full shadow"
+                className="w-3 h-3 rounded-full shadow border-2"
                 style={{
                   backgroundColor: item.color,
-                  border: `2px solid ${AMAZON_ORANGE}`,
+                  borderColor: "var(--color-accent)",
                 }}
               ></div>
               <span className="text-app font-medium">{item.name}</span>
