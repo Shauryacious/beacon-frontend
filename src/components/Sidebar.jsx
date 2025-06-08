@@ -17,7 +17,7 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       <aside
         onMouseEnter={() => setIsSidebarOpen(true)}
         onMouseLeave={() => setIsSidebarOpen(false)}
-        className={`fixed left-0 z-30 top-16 h-[calc(100vh-4rem)] bg-[color:var(--color-card)] border-r border-[color:var(--color-border)] shadow transition-all duration-500 ${
+        className={`fixed left-0 z-30 top-16 h-[150vh] bg-[color:var(--color-card)] border-r border-[color:var(--color-border)] shadow transition-all duration-500 ${
           isSidebarOpen ? "w-64" : "w-20"
         } ${scrollDirection === "down" ? "-translate-y-16" : "translate-y-0"}`}
         style={{ willChange: "transform" }}
