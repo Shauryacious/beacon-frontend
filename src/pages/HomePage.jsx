@@ -10,16 +10,21 @@ import FraudNetworkVisualization from "../components/FraudNetworkVisualization";
 import { AlertTriangle, Archive, DollarSign } from "lucide-react";
 
 export default function HomePage() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [theme, setTheme] = useState(() => {
+    if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
+      return localStorage.getItem("theme");
+    }
+    return "dark"; // Default to dark mode
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [isDarkMode]);
+    const root = window.document.documentElement;
+    root.classList.remove("light", "dark");
+    root.classList.add(theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-900 font-sans text-slate-900 dark:text-slate-100 transition-colors duration-300">
@@ -32,7 +37,7 @@ export default function HomePage() {
           isSidebarOpen ? "pl-64" : "pl-20"
         }`}
       >
-        <Header isDarkMode={isDarkMode} setIsDarkMode={setIsDarkMode} />
+        <Header theme={theme} setTheme={setTheme} />
         <main className="px-4 sm:px-6 pb-8">
           <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
             Last data refresh:{" "}
@@ -41,12 +46,10 @@ export default function HomePage() {
             </span>
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-            {/* Column 1 */}
             <div className="flex flex-col gap-6 lg:col-span-1">
               <TrustScoreOverview />
               <RealTimeAlertFeed />
             </div>
-            {/* Column 2 & 3 */}
             <div className="lg:col-span-3 flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <KeyMetricCard

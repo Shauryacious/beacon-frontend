@@ -1,1 +1,90 @@
 @import "tailwindcss";
+
+/* Enable class-based dark mode for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Amazon-inspired palette with improved light mode */
+:root {
+  --color-bg: #f6f7f9;
+  --color-card: #fff;
+  --color-primary: #232f3e;
+  --color-accent: #febd69;
+  --color-border: #e3e6e6;
+  --color-header: #131921;
+  --color-text: #232f3e;
+  --color-muted: #6b7280;
+  --color-table-header: #f3f4f6;
+  --color-badge-high: #e5f6ef;
+  --color-badge-medium: #fffbe6;
+  --color-badge-low: #fef2f2;
+  --color-badge-high-text: #127846;
+  --color-badge-medium-text: #b38600;
+  --color-badge-low-text: #a61d24;
+  --color-flag-bg: #fff7e6;
+  --color-flag-border: #ffd591;
+}
+
+.dark {
+  --color-bg: #181c24;
+  --color-card: #232f3e;
+  --color-primary: #febd69;
+  --color-accent: #febd69;
+  --color-border: #232f3e;
+  --color-header: #232f3e;
+  --color-text: #fafafa;
+  --color-muted: #a1a1aa;
+  --color-table-header: #232f3e;
+  --color-badge-high: #14342b;
+  --color-badge-medium: #4d4424;
+  --color-badge-low: #3e2323;
+  --color-badge-high-text: #6ee7b7;
+  --color-badge-medium-text: #fde68a;
+  --color-badge-low-text: #fca5a5;
+  --color-flag-bg: #3b2e17;
+  --color-flag-border: #b45309;
+}
+
+@theme {
+  --color-bg: var(--color-bg);
+  --color-card: var(--color-card);
+  --color-primary: var(--color-primary);
+  --color-accent: var(--color-accent);
+  --color-border: var(--color-border);
+  --color-header: var(--color-header);
+  --color-text: var(--color-text);
+  --color-muted: var(--color-muted);
+  --color-table-header: var(--color-table-header);
+  --color-badge-high: var(--color-badge-high);
+  --color-badge-medium: var(--color-badge-medium);
+  --color-badge-low: var(--color-badge-low);
+  --color-badge-high-text: var(--color-badge-high-text);
+  --color-badge-medium-text: var(--color-badge-medium-text);
+  --color-badge-low-text: var(--color-badge-low-text);
+  --color-flag-bg: var(--color-flag-bg);
+  --color-flag-border: var(--color-flag-border);
+}
+
+.bg-app {
+  background-color: var(--color-bg);
+}
+.bg-app-card {
+  background-color: var(--color-card);
+}
+.text-app {
+  color: var(--color-text);
+}
+.text-app-muted {
+  color: var(--color-muted);
+}
+.border-app {
+  border-color: var(--color-border);
+}
+.bg-app-header {
+  background-color: var(--color-header);
+}
+.bg-app-accent {
+  background-color: var(--color-accent);
+}
+.bg-app-table-header {
+  background-color: var(--color-table-header);
+}

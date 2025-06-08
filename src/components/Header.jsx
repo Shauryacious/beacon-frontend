@@ -2,7 +2,7 @@ import React from "react";
 import { Bell, User, Sun, Moon, Search } from "lucide-react";
 import useScrollDirection from "../hooks/useScrollDirection";
 
-const Header = ({ isDarkMode, setIsDarkMode }) => {
+const Header = ({ theme, setTheme }) => {
   const scrollDirection = useScrollDirection();
 
   return (
@@ -12,7 +12,6 @@ const Header = ({ isDarkMode, setIsDarkMode }) => {
       }`}
       style={{ willChange: "transform" }}
     >
-      {/* Left: Trustify Logo & Name */}
       <div className="flex items-center min-w-[160px]">
         <svg
           className="w-8 h-8 text-blue-600"
@@ -26,7 +25,6 @@ const Header = ({ isDarkMode, setIsDarkMode }) => {
         </span>
       </div>
 
-      {/* Center: Search Bar */}
       <div className="flex-1 flex justify-center mx-4">
         <div className="relative w-full max-w-2xl">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -38,13 +36,12 @@ const Header = ({ isDarkMode, setIsDarkMode }) => {
         </div>
       </div>
 
-      {/* Right: Actions */}
       <div className="flex items-center gap-4 min-w-[160px] justify-end">
         <button
-          onClick={() => setIsDarkMode(!isDarkMode)}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
         >
-          {isDarkMode ? (
+          {theme === "dark" ? (
             <Sun className="w-5 h-5" />
           ) : (
             <Moon className="w-5 h-5" />
