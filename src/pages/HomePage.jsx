@@ -17,7 +17,7 @@ export default function HomePage() {
     return "light"; // Default to light mode
   });
 
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const root = window.document.documentElement;
