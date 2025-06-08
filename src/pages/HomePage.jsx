@@ -14,7 +14,7 @@ export default function HomePage() {
     if (typeof localStorage !== "undefined" && localStorage.getItem("theme")) {
       return localStorage.getItem("theme");
     }
-    return "dark"; // Default to dark mode
+    return "light"; // Default to light mode
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
