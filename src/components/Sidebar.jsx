@@ -17,24 +17,32 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
       <aside
         onMouseEnter={() => setIsSidebarOpen(true)}
         onMouseLeave={() => setIsSidebarOpen(false)}
-        className={`fixed left-0 z-30 top-16 h-[calc(100vh-4rem)] bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 transition-all duration-500 ${
+        className={`fixed left-0 z-30 top-16 h-[calc(100vh-4rem)] bg-[color:var(--color-card)] border-r border-[color:var(--color-border)] shadow transition-all duration-500 ${
           isSidebarOpen ? "w-64" : "w-20"
         } ${scrollDirection === "down" ? "-translate-y-16" : "translate-y-0"}`}
         style={{ willChange: "transform" }}
       >
-        <nav className="p-4">
-          <ul className="space-y-2">
+        <nav className="p-3">
+          <ul className="space-y-1">
             {navItems.map((item) => (
               <li key={item.label}>
                 <a
                   href="#"
-                  className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                    item.active
-                      ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold"
-                      : "hover:bg-slate-100 dark:hover:bg-slate-800"
-                  }`}
+                  className={`flex items-center gap-3 px-3 py-2 rounded-lg font-medium transition-all group
+                    ${
+                      item.active
+                        ? "bg-[color:var(--color-accent)]/20 text-[color:var(--color-primary)] border-l-4 border-[color:var(--color-accent)]"
+                        : "hover:bg-[color:var(--color-accent)]/10 text-[color:var(--color-text)]"
+                    }
+                  `}
                 >
-                  <item.icon className="w-6 h-6 flex-shrink-0" />
+                  <item.icon
+                    className={`w-6 h-6 flex-shrink-0 ${
+                      item.active
+                        ? "text-[color:var(--color-accent)]"
+                        : "text-[color:var(--color-muted)] group-hover:text-[color:var(--color-accent)]"
+                    }`}
+                  />
                   <span
                     className={`transition-opacity duration-200 ${
                       isSidebarOpen ? "opacity-100" : "opacity-0"
