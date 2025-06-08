@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  ChevronsLeft,
-  ChevronsRight,
-  LayoutDashboard,
-  UserCheck,
-  FileText,
-  Sliders,
-} from "lucide-react";
+import { LayoutDashboard, UserCheck, FileText, Sliders } from "lucide-react";
 import useScrollDirection from "../hooks/useScrollDirection";
 
 const navItems = [
@@ -22,27 +15,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
   return (
     <>
       <aside
+        onMouseEnter={() => setIsSidebarOpen(true)}
+        onMouseLeave={() => setIsSidebarOpen(false)}
         className={`fixed left-0 z-30 top-16 h-[calc(100vh-4rem)] bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 transition-all duration-500 ${
           isSidebarOpen ? "w-64" : "w-20"
         } ${scrollDirection === "down" ? "-translate-y-16" : "translate-y-0"}`}
         style={{ willChange: "transform" }}
       >
-        <div
-          className={`flex items-center ${
-            isSidebarOpen ? "justify-end" : "justify-center"
-          } h-16 border-b border-slate-200/80 dark:border-slate-800 px-4`}
-        >
-          <button
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
-          >
-            {isSidebarOpen ? (
-              <ChevronsLeft className="w-5 h-5" />
-            ) : (
-              <ChevronsRight className="w-5 h-5" />
-            )}
-          </button>
-        </div>
         <nav className="p-4">
           <ul className="space-y-2">
             {navItems.map((item) => (
@@ -56,11 +35,13 @@ const Sidebar = ({ isSidebarOpen, setIsSidebarOpen }) => {
                   }`}
                 >
                   <item.icon className="w-6 h-6 flex-shrink-0" />
-                  {isSidebarOpen && (
-                    <span className="transition-opacity duration-200">
-                      {item.label}
-                    </span>
-                  )}
+                  <span
+                    className={`transition-opacity duration-200 ${
+                      isSidebarOpen ? "opacity-100" : "opacity-0"
+                    }`}
+                  >
+                    {item.label}
+                  </span>
                 </a>
               </li>
             ))}
