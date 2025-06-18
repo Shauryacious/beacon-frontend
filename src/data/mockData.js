@@ -11,6 +11,8 @@ export const initialTrustScoreData = {
     ],
 };
 
+
+
 export const riskRankingData = [
     { id: 1, asin: 'B08N5HRW3W', sellerName: 'GlobalGadgets', trustScore: 95, flags: ['Verified Seller'], lastUpdated: '2m ago' },
     { id: 2, asin: 'B09V3J8Q4P', sellerName: 'SuperDeals', trustScore: 82, flags: ['New Product'], lastUpdated: '15m ago' },
