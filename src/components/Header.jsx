@@ -1,9 +1,27 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Bell, User, Sun, Moon, Search } from "lucide-react";
+import { useNavigate, Link } from "react-router-dom";
 import useScrollDirection from "../hooks/useScrollDirection";
+import UserDropdown from "./UserDropdown";
+import { useAuth } from "../context/AuthContext";
 
 const Header = ({ theme, setTheme }) => {
   const scrollDirection = useScrollDirection();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <header
@@ -13,11 +31,13 @@ const Header = ({ theme, setTheme }) => {
       style={{ willChange: "transform" }}
     >
       <div className="flex items-center min-w-[160px]">
-        <img
-          src="logo.png"
-          alt="BEACON Logo"
-          className="w-40 h-32 object-contain"
-        />
+        <Link to="/">
+          <img
+            src="logo.png"
+            alt="BEACON Logo"
+            className="w-40 h-32 object-contain cursor-pointer"
+          />
+        </Link>
       </div>
 
       <div className="flex-1 flex justify-center mx-4">
@@ -46,7 +66,17 @@ const Header = ({ theme, setTheme }) => {
           <Bell className="w-5 h-5" />
           <span className="absolute top-1 right-1.5 block w-2 h-2 bg-[#FF9900] rounded-full animate-pulse"></span>
         </button>
-        <User className="w-9 h-9 p-1.5 bg-[#232F3E] rounded-full" />
+        <div className="relative" ref={dropdownRef}>
+          <button
+            className="p-2 rounded-full hover:bg-[#232F3E] transition-colors"
+            onClick={() => setDropdownOpen((open) => !open)}
+          >
+            <User className="w-9 h-9 p-1.5 bg-[#232F3E] rounded-full" />
+          </button>
+          {dropdownOpen && (
+            <UserDropdown closeDropdown={() => setDropdownOpen(false)} />
+          )}
+        </div>
       </div>
     </header>
   );
