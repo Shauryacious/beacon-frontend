@@ -1,11 +1,14 @@
 // src/components/RiskRankingTable.jsx
 import React, { useEffect, useState } from "react";
-import { fetchPendingProducts } from "../api/productApi";
+import {
+  fetchPendingProducts,
+  approveProduct,
+  takedownProduct,
+} from "../api/productApi";
 import Card from "./Card";
 import CardHeader from "./CardHeader";
 import { BarChart2, MoreVertical } from "lucide-react";
 
-// Helper for badge color classes
 const getScoreBadge = (score) => {
   if (score > 0.8)
     return "bg-green-100 text-green-800 border border-transparent";
@@ -18,20 +21,53 @@ export default function RiskRankingTable() {
   const [products, setProducts] = useState([]);
   const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
+  const [actionLoading, setActionLoading] = useState(null); // productId or null
+  const [error, setError] = useState("");
+
+  const fetchData = async (page = 1) => {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetchPendingProducts({ page });
+      setProducts(res.data.products || []);
+      setPagination({ ...res.data.pagination });
+    } catch (err) {
+      setError("Failed to load products.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    setLoading(true);
-    fetchPendingProducts({ page: pagination.page })
-      .then((res) => {
-        setProducts(res.data.products || []);
-        setPagination((prev) => ({
-          ...prev,
-          ...res.data.pagination,
-        }));
-      })
-      .finally(() => setLoading(false));
+    fetchData(pagination.page);
     // eslint-disable-next-line
   }, [pagination.page]);
+
+  const handleApprove = async (id) => {
+    setActionLoading(id);
+    setError("");
+    try {
+      await approveProduct(id);
+      await fetchData(pagination.page);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to approve product.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleTakedown = async (id) => {
+    setActionLoading(id);
+    setError("");
+    try {
+      await takedownProduct(id, "Admin takedown from dashboard");
+      await fetchData(pagination.page);
+    } catch (err) {
+      setError(err.response?.data?.error || "Failed to takedown product.");
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   return (
     <Card className="lg:col-span-3 flex flex-col border-app bg-app-card shadow-sm rounded-b-xl overflow-hidden">
@@ -45,6 +81,9 @@ export default function RiskRankingTable() {
         </button>
       </CardHeader>
       <div className="flex-grow overflow-x-auto">
+        {error && (
+          <div className="text-red-500 text-sm text-center py-2">{error}</div>
+        )}
         <table className="w-full text-sm text-app border-separate border-spacing-0">
           <thead className="text-xs uppercase bg-app-table-header sticky top-0 z-10">
             <tr>
@@ -142,9 +181,25 @@ export default function RiskRankingTable() {
                       : "--"}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button className="p-1.5 rounded-md hover:bg-app-table-header text-app-muted hover:text-app transition-colors">
-                      <MoreVertical className="w-5 h-5" />
-                    </button>
+                    <div className="flex gap-2 justify-center">
+                      <button
+                        className="px-3 py-1 text-xs font-semibold rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-60"
+                        disabled={actionLoading === product._id}
+                        onClick={() => handleApprove(product._id)}
+                      >
+                        {actionLoading === product._id ? "..." : "Approve"}
+                      </button>
+                      <button
+                        className="px-3 py-1 text-xs font-semibold rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+                        disabled={actionLoading === product._id}
+                        onClick={() => handleTakedown(product._id)}
+                      >
+                        {actionLoading === product._id ? "..." : "Takedown"}
+                      </button>
+                      <button className="p-1.5 rounded-md hover:bg-app-table-header text-app-muted hover:text-app transition-colors">
+                        <MoreVertical className="w-5 h-5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -152,7 +207,7 @@ export default function RiskRankingTable() {
           </tbody>
         </table>
       </div>
-      {/* Pagination controls (optional, can be improved) */}
+      {/* Pagination controls */}
       <div className="flex justify-end items-center gap-2 p-4 border-t border-app">
         <button
           className="px-3 py-1 rounded border bg-white"
