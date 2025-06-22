@@ -1,23 +1,42 @@
-import React from "react";
+// src/components/RiskRankingTable.jsx
+import React, { useEffect, useState } from "react";
+import { fetchPendingProducts } from "../api/productApi";
 import Card from "./Card";
 import CardHeader from "./CardHeader";
 import { BarChart2, MoreVertical } from "lucide-react";
-import { riskRankingData } from "../data/mockData";
 
 // Helper for badge color classes
 const getScoreBadge = (score) => {
-  if (score > 80)
-    return "bg-[color:var(--color-badge-high)] text-[color:var(--color-badge-high-text)] border border-transparent";
-  if (score > 50)
-    return "bg-[color:var(--color-badge-medium)] text-[color:var(--color-badge-medium-text)] border border-transparent";
-  return "bg-[color:var(--color-badge-low)] text-[color:var(--color-badge-low-text)] border border-transparent";
+  if (score > 0.8)
+    return "bg-green-100 text-green-800 border border-transparent";
+  if (score > 0.5)
+    return "bg-yellow-100 text-yellow-800 border border-transparent";
+  return "bg-red-100 text-red-800 border border-transparent";
 };
 
 export default function RiskRankingTable() {
+  const [products, setProducts] = useState([]);
+  const [pagination, setPagination] = useState({ page: 1, pages: 1, total: 0 });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    fetchPendingProducts({ page: pagination.page })
+      .then((res) => {
+        setProducts(res.data.products || []);
+        setPagination((prev) => ({
+          ...prev,
+          ...res.data.pagination,
+        }));
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line
+  }, [pagination.page]);
+
   return (
     <Card className="lg:col-span-3 flex flex-col border-app bg-app-card shadow-sm rounded-b-xl overflow-hidden">
       <CardHeader
-        title="Seller/Listing Risk Ranking"
+        title="Pending Product Risk Review"
         icon={BarChart2}
         className="border-b border-app bg-app-table-header"
       >
@@ -35,15 +54,21 @@ export default function RiskRankingTable() {
                   className="w-4 h-4 text-[color:var(--color-accent)] bg-app-card border-app rounded focus:ring-[color:var(--color-accent)]"
                 />
               </th>
-              <th className="px-4 py-3 font-medium whitespace-nowrap">ASIN</th>
+              <th className="px-4 py-3 font-medium whitespace-nowrap">SKU</th>
               <th className="px-4 py-3 font-medium whitespace-nowrap">
-                Seller Name
+                Product Name
+              </th>
+              <th className="px-4 py-3 font-medium whitespace-nowrap">
+                Seller
               </th>
               <th className="px-4 py-3 font-medium whitespace-nowrap">
                 Trust Score
               </th>
               <th className="px-4 py-3 font-medium whitespace-nowrap">
                 Detected Flags
+              </th>
+              <th className="px-4 py-3 font-medium whitespace-nowrap">
+                Status
               </th>
               <th className="px-4 py-3 font-medium whitespace-nowrap">
                 Last Updated
@@ -54,56 +79,102 @@ export default function RiskRankingTable() {
             </tr>
           </thead>
           <tbody className="divide-y border-app">
-            {riskRankingData.map((item, idx) => (
-              <tr
-                key={item.id}
-                className={`bg-app-card hover:bg-[color:var(--color-bg)] transition-colors ${
-                  idx === riskRankingData.length - 1 ? "last:rounded-b-xl" : ""
-                }`}
-              >
-                <td className="p-4 w-4">
-                  <input
-                    type="checkbox"
-                    className="w-4 h-4 text-[color:var(--color-accent)] bg-app-card border-app rounded focus:ring-[color:var(--color-accent)]"
-                  />
-                </td>
-                <td className="px-4 py-3 font-mono text-xs text-app-muted">
-                  {item.asin}
-                </td>
-                <td className="px-4 py-3 font-medium text-app">
-                  {item.sellerName}
-                </td>
-                <td className="px-4 py-3">
-                  <span
-                    className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getScoreBadge(
-                      item.trustScore
-                    )}`}
-                  >
-                    {item.trustScore}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="flex flex-wrap gap-1.5">
-                    {item.flags.map((flag) => (
-                      <span
-                        key={flag}
-                        className="px-2.5 py-1 text-xs font-medium bg-[color:var(--color-flag-bg)] text-app border border-[color:var(--color-flag-border)] rounded-full"
-                      >
-                        {flag}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                <td className="px-4 py-3 text-app-muted">{item.lastUpdated}</td>
-                <td className="px-4 py-3 text-center">
-                  <button className="p-1.5 rounded-md hover:bg-app-table-header text-app-muted hover:text-app transition-colors">
-                    <MoreVertical className="w-5 h-5" />
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan={9} className="text-center py-8">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : products.length === 0 ? (
+              <tr>
+                <td colSpan={9} className="text-center py-8 text-gray-500">
+                  No pending products found.
+                </td>
+              </tr>
+            ) : (
+              products.map((product) => (
+                <tr
+                  key={product._id}
+                  className="bg-app-card hover:bg-[color:var(--color-bg)] transition-colors"
+                >
+                  <td className="p-4 w-4">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 text-[color:var(--color-accent)] bg-app-card border-app rounded focus:ring-[color:var(--color-accent)]"
+                    />
+                  </td>
+                  <td className="px-4 py-3 font-mono text-xs text-app-muted">
+                    {product.sku}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-app">
+                    {product.name}
+                  </td>
+                  <td className="px-4 py-3 font-medium text-app">
+                    {product.seller?.businessName || "N/A"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getScoreBadge(
+                        product.trustScore ?? 0
+                      )}`}
+                    >
+                      {typeof product.trustScore === "number"
+                        ? (product.trustScore * 100).toFixed(0)
+                        : "--"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-1.5">
+                      {(product.flags || []).map((flag) => (
+                        <span
+                          key={flag}
+                          className="px-2.5 py-1 text-xs font-medium bg-[color:var(--color-flag-bg)] text-app border border-[color:var(--color-flag-border)] rounded-full"
+                        >
+                          {flag}
+                        </span>
+                      ))}
+                    </div>
+                  </td>
+                  <td className="px-4 py-3">{product.status}</td>
+                  <td className="px-4 py-3 text-app-muted">
+                    {product.updatedAt
+                      ? new Date(product.updatedAt).toLocaleString()
+                      : "--"}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <button className="p-1.5 rounded-md hover:bg-app-table-header text-app-muted hover:text-app transition-colors">
+                      <MoreVertical className="w-5 h-5" />
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
+      </div>
+      {/* Pagination controls (optional, can be improved) */}
+      <div className="flex justify-end items-center gap-2 p-4 border-t border-app">
+        <button
+          className="px-3 py-1 rounded border bg-white"
+          disabled={pagination.page <= 1}
+          onClick={() =>
+            setPagination((prev) => ({ ...prev, page: prev.page - 1 }))
+          }
+        >
+          Prev
+        </button>
+        <span>
+          Page {pagination.page} of {pagination.pages}
+        </span>
+        <button
+          className="px-3 py-1 rounded border bg-white"
+          disabled={pagination.page >= pagination.pages}
+          onClick={() =>
+            setPagination((prev) => ({ ...prev, page: prev.page + 1 }))
+          }
+        >
+          Next
+        </button>
       </div>
     </Card>
   );
