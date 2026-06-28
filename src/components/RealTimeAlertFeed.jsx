@@ -4,7 +4,7 @@ import CardHeader from "./CardHeader";
 import { Bell, Filter, AlertTriangle, CheckCircle } from "lucide-react";
 import { alertFeedData } from "../data/mockData";
 
-const RealTimeAlertFeed = () => {
+const RealTimeAlertFeed = ({ alerts = alertFeedData }) => {
   const getAlertStyle = (type) => {
     switch (type) {
       case "High Risk":
@@ -51,7 +51,7 @@ const RealTimeAlertFeed = () => {
       </CardHeader>
       <div className="p-4 flex-grow overflow-y-auto h-96 no-scrollbar">
         <div className="flex flex-col gap-3">
-          {alertFeedData.map((alert) => {
+          {alerts.map((alert) => {
             const {
               icon: Icon,
               textColor,

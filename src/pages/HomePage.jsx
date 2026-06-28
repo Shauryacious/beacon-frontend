@@ -8,6 +8,16 @@ import HistoricalTrendAnalysis from "../components/HistoricalTrendAnalysis";
 import KeyMetricCard from "../components/KeyMetricCard";
 import FraudNetworkVisualization from "../components/FraudNetworkVisualization";
 import { AlertTriangle, Archive, DollarSign } from "lucide-react";
+import { fetchTrustScore, fetchAlerts, fetchTrends, fetchRiskRanking } from "../api/dashboardApi";
+
+const rel = (t) => {
+  if (!t) return "";
+  const s = Math.max(0, (Date.now() - new Date(t)) / 1000);
+  if (s < 60) return "Just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  return `${Math.floor(s / 86400)}d ago`;
+};
 
 export default function HomePage() {
   const [theme, setTheme] = useState(() => {
@@ -18,6 +28,20 @@ export default function HomePage() {
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [trust, setTrust] = useState(null);
+  const [alerts, setAlerts] = useState(null);
+  const [trends, setTrends] = useState(null);
+  const [risk, setRisk] = useState([]);
+
+  useEffect(() => {
+    fetchTrustScore().then((r) => setTrust(r.data)).catch(() => {});
+    fetchAlerts().then((r) => setAlerts(r.data.map((a, i) => ({ id: i, ...a, time: rel(a.time) })))).catch(() => {});
+    fetchTrends().then((r) => setTrends(r.data)).catch(() => {});
+    fetchRiskRanking().then((r) => setRisk(r.data)).catch(() => {});
+  }, []);
+
+  const highRisk = risk.filter((p) => p.trustScore < 50).length;
+  const openCases = risk.filter((p) => (p.flags || []).length > 0).length;
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -47,36 +71,36 @@ export default function HomePage() {
           </p>
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             <div className="flex flex-col gap-6 lg:col-span-1">
-              <TrustScoreOverview />
-              <RealTimeAlertFeed />
+              <TrustScoreOverview data={trust || undefined} />
+              <RealTimeAlertFeed alerts={alerts || undefined} />
             </div>
             <div className="lg:col-span-3 flex flex-col gap-6">
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                 <KeyMetricCard
                   icon={AlertTriangle}
                   title="High-Risk Sellers"
-                  value="12"
-                  change="+2"
+                  value={String(highRisk || 0)}
+                  change={highRisk ? `+${highRisk}` : "0"}
                   changeType="negative"
                 />
                 <KeyMetricCard
                   icon={Archive}
                   title="Open Cases"
-                  value="34"
-                  change="-5"
+                  value={String(openCases || 0)}
+                  change={`${risk.length} listings`}
                   changeType="positive"
                 />
                 <KeyMetricCard
                   icon={DollarSign}
-                  title="Value at Risk"
-                  value="$1.2M"
-                  change="+$50k"
-                  changeType="negative"
+                  title="Avg Trust Score"
+                  value={trust ? `${trust.score}/100` : "—"}
+                  change={trust && trust.score < 60 ? "at risk" : "healthy"}
+                  changeType={trust && trust.score < 60 ? "negative" : "positive"}
                 />
               </div>
               <RiskRankingTable />
               <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
-                <HistoricalTrendAnalysis />
+                <HistoricalTrendAnalysis data={trends || undefined} />
                 <div className="xl:col-span-2">
                   <FraudNetworkVisualization />
                 </div>

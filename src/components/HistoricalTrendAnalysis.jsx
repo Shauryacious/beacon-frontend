@@ -14,7 +14,7 @@ import {
   Legend,
 } from "recharts";
 
-const HistoricalTrendAnalysis = () => (
+const HistoricalTrendAnalysis = ({ data = historicalTrendData }) => (
   <Card className="lg:col-span-3 flex flex-col rounded-2xl shadow-md border border-app bg-app-card">
     <CardHeader
       title="Historical Trend Analysis"
@@ -30,7 +30,7 @@ const HistoricalTrendAnalysis = () => (
     <div className="p-4 flex-grow h-80">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
-          data={historicalTrendData}
+          data={data}
           margin={{ top: 5, right: 20, left: -10, bottom: 5 }}
         >
           <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />

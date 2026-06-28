@@ -5,7 +5,7 @@ import TrustScoreDonut from "./TrustScoreDonut";
 import { Shield } from "lucide-react";
 import { initialTrustScoreData } from "../data/mockData";
 
-const TrustScoreOverview = () => (
+const TrustScoreOverview = ({ data = initialTrustScoreData }) => (
   <Card className="flex flex-col border border-app bg-app-card rounded-2xl shadow-sm hover:shadow-lg transition-shadow duration-300">
     <CardHeader
       title="Trust Score Overview"
@@ -13,9 +13,9 @@ const TrustScoreOverview = () => (
       className="bg-app-table-header border-b border-app rounded-t-2xl"
     />
     <div className="p-6 flex-grow">
-      <TrustScoreDonut data={initialTrustScoreData} />
+      <TrustScoreDonut data={data} />
       <div className="mt-6 space-y-2 text-sm">
-        {initialTrustScoreData.breakdown.map((item) => (
+        {data.breakdown.map((item) => (
           <div
             key={item.name}
             className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg hover:bg-[color:var(--color-bg)] transition-colors"
